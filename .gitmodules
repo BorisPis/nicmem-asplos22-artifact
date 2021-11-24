@@ -1,0 +1,9 @@
+[submodule "dpdk"]
+	path = dpdk
+	url = git@github.com:BorisPis/asplos22-nicmem-dpdk.git
+[submodule "fastclick"]
+	path = fastclick
+	url = git@github.com:BorisPis/asplos22-nicmem-fastclick.git
+[submodule "trex"]
+	path = trex
+	url = git@github.com:BorisPis/asplos22-nicmem-trex.git
