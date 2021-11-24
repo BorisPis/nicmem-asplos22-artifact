@@ -1,9 +1,20 @@
 [submodule "dpdk"]
 	path = dpdk
-	url = git@github.com:BorisPis/asplos22-nicmem-dpdk.git
+	url = https://github.com/BorisPis/asplos22-nicmem-dpdk.git
 [submodule "fastclick"]
 	path = fastclick
-	url = git@github.com:BorisPis/asplos22-nicmem-fastclick.git
+	url = https://github.com/BorisPis/asplos22-nicmem-fastclick.git
 [submodule "trex"]
 	path = trex
-	url = git@github.com:BorisPis/asplos22-nicmem-trex.git
+	url = https://github.com/BorisPis/asplos22-nicmem-trex.git
+[submodule "tools/pcm"]
+	path = tools/pcm
+	url = https://github.com/opcm/pcm.git
+[submodule "micas"]
+	path = micas
+	url = https://github.com/BorisPis/asplos22-nicmem-mica.git
+	branch = server-asplos22
+[submodule "micac"]
+	path = micac
+	url = https://github.com/BorisPis/asplos22-nicmem-mica.git
+	branch = client-asplos22

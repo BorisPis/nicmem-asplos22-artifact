@@ -1,0 +1,11 @@
+#-------------------------------------------------------------------------------
+# define arrows: x, y, xdelta, y delta
+# (the specific values are/were printed by the gnuplot script.)
+# NOTE: using gnuplot 'index' for datasets, so double-blank lines are important.
+#-------------------------------------------------------------------------------
+# loss
+1.808,0.500,0.000,127.500
+
+
+# latency
+1.808,8.000,0.000,4056.000

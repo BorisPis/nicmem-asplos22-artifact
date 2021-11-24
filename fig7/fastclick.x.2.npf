@@ -1,0 +1,38 @@
+DDIOTune(N_WAYS $DDIO_WAYS, DEV 3b:00.0, PRINT true)
+DDIOTune(N_WAYS $DDIO_WAYS, DEV 5e:00.0, PRINT true)
+
+fd0 :: FromDPDKDevice(0, MAXTHREADS $CPUS1 , BURST 32 , TIMESTAMP false, PAUSE none, CLEAR 0, NDESC $RXDESC, VERBOSE 1)
+    -> SetCycleCount()
+    -> EtherMirror()
+    -> WorkPackage(S $WP_MEMSIZE, N $WP_MEMN, R 0, PAYLOAD false, W $WP_CPU, WRITE $WP_WRITE)
+    -> accum1 :: CycleCountAccum()
+    -> ToDPDKDevice(0000:3b:00.0, NDESC 1024, BLOCKING true)
+
+fd1 :: FromDPDKDevice(1, MAXTHREADS $CPUS2 , BURST 32 , TIMESTAMP false, PAUSE none, CLEAR 0, NDESC $RXDESC, VERBOSE 1)
+    -> SetCycleCount()
+    -> EtherMirror()
+    -> WorkPackage(S $WP_MEMSIZE, N $WP_MEMN, R 0, PAYLOAD false, W $WP_CPU, WRITE $WP_WRITE)
+    -> accum2 :: CycleCountAccum()
+    -> ToDPDKDevice(0000:5e:00.0, NDESC 1024, BLOCKING true)
+
+DriverManager(  wait $STARTUP,
+		// print "RESULT-CYCLE_IDLE1 $(fd0.cycles_idle)",
+		// print "RESULT-CYCLE_IDLE2 $(fd1.cycles_idle)",
+		print "Measuring cycles from now!",
+		write fd0.cycles_idle 0,
+		write fd0.cycles_pb 0,
+		write fd1.cycles_idle 0,
+		write fd1.cycles_pb 0,
+                write fd0.xstats 0,
+                write fd1.xstats 0,
+		wait 20,
+                read fd0.xstats,
+                read fd1.xstats,
+                print "RESULT-CYCLEPP1 $(accum1.cycles_pp)",
+                print "RESULT-CYCLEPP2 $(accum2.cycles_pp)",
+		print "RESULT-CYCLEPB1 $(fd0.cycles_pb)",
+		print "RESULT-CYCLEPB2 $(fd1.cycles_pb)",
+		print "RESULT-CYCLE_IDLE1 $(fd0.cycles_idle)",
+		print "RESULT-CYCLE_IDLE2 $(fd1.cycles_idle)",
+		wait,
+                )

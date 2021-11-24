@@ -1,0 +1,9 @@
+DDIOTune(N_WAYS $DDIO_WAYS, DEV 0000:3b:00.0, PRINT true)
+
+fd0 :: FromDPDKDevice(0, MAXTHREADS $CPUS1 , BURST 32 , TIMESTAMP false, PAUSE none, CLEAR 0, NDESC $RXDESC, VERBOSE 1)
+    -> WorkPackage(S $WP_MEMSIZE, N $WP_MEMN, R 0, PAYLOAD false, W $WP_CPU, WRITE $WP_WRITE)
+    -> ToDPDKDevice(0000:3b:00.0, NDESC 1024, BLOCKING true)
+
+DriverManager(  wait,
+                read fd0.xstats,
+                )

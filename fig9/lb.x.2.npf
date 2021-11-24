@@ -1,0 +1,202 @@
+elementclass myLB {
+    [0]
+    -> FlowIPManagerIMP(CAPACITY $CAPACITY)
+    -> FlowIPLoadBalancer(DST 10.180.250.5 ,
+                          DST 10.180.250.6 ,
+                          DST 10.180.250.7 ,
+                          DST 10.180.250.8 ,
+                          DST 10.180.250.9 ,
+                          DST 10.180.250.10 ,
+                          DST 10.180.250.11 ,
+                          DST 10.180.250.12 ,
+                          DST 10.180.250.13 ,
+                          DST 10.180.250.14 ,
+                          DST 10.180.250.15 ,
+                          DST 10.180.250.16 ,
+                          DST 10.180.250.17 ,
+                          DST 10.180.250.18 ,
+                          DST 10.180.250.19 ,
+                          DST 10.180.250.20 ,
+                          DST 10.180.250.21 ,
+                          DST 10.180.250.22 ,
+                          DST 10.180.250.23 ,
+                          DST 10.180.250.24 ,
+                          DST 10.180.250.25 ,
+                          DST 10.180.250.26 ,
+                          DST 10.180.250.27 ,
+                          DST 10.180.250.28 ,
+                          DST 10.180.250.29 ,
+                          DST 10.180.250.30 ,
+                          DST 10.180.250.31 ,
+                          DST 10.180.250.32 ,
+                          DST 10.180.250.33 ,
+                          DST 10.180.250.34 ,
+                          DST 10.180.250.35 ,
+                          DST 10.180.250.36 , VIP 10.2.0.1,
+			  LB_MODE rr, NSERVER 0, FORCE_TRACK_LOAD true) 
+    ->  [0]
+}
+
+define ($MTU 1500)
+define ($ip 10.0.0.1)
+define ($eth 1c:34:da:64:6c:94)
+elementclass FNT { 
+    tol :: Discard(); //ToHost normally
+
+input[0] ->
+            c0 :: Classifier(    12/0806 20/0001,
+                                 12/0806 20/0002,
+                                 12/0800,
+                                 -);
+
+        // Respond to ARP Query
+        c0[0] -> arpress :: ARPResponder($ip $eth);
+        arpress[0] -> Print("ARP QUERY") -> [0]output;
+
+        // Deliver ARP responses to ARP queriers as well as Linux.
+        t :: Tee(2);
+        c0[1] -> t;
+        t[0] -> Print("Input to linux") -> tol; //To linux
+        t[1] -> Print("Arp response") -> [0]output; //Directly output
+
+  
+        // Unknown ethernet type numbers.
+        c0[3] -> Print() -> Discard();
+
+        
+    // An "ARP querier" for each interface.
+    arpq0 :: EtherEncap(0x0800, 1c:34:da:64:6c:94, b8:59:9f:f7:3a:e5);
+    // Connect ARP outputs to the interface queues.
+    arpq0 -> [0]output;
+
+    // IP routing table.
+    rt :: LookupIPRouteMP(   0.0.0.0/0 0);
+
+    // Hand incoming IP packets to the routing table.
+    // CheckIPHeader checks all the lengths and length fields
+    // for sanity.
+    ip ::
+    Strip(14)
+    -> CheckIPHeader(CHECKSUM false, VERBOSE false)
+    -> [0]rt;
+
+    oerror :: IPPrint("ICMP Error : DF") -> [0]rt;
+    ttlerror :: IPPrint("ICMP Error : TTL") -> [0]rt;
+
+
+    c0[2] -> Paint(1) -> ip;
+    rt[0] -> output0 :: IPOutputCombo(2, 10.1.0.1, $MTU);
+    // DecIPTTL[1] emits packets with expired TTLs.
+    // Reply with ICMPs. Rate-limit them?
+    output0[3] -> ICMPError(10.1.0.1, timeexceeded, SET_FIX_ANNO 0) -> IPPrint("TTL error") -> ttlerror;
+    // Send back ICMP UNREACH/NEEDFRAG messages on big packets with DF set.
+    // This makes path mtu discovery work.
+    output0[4] -> ICMPError(10.1.0.1, unreachable, needfrag, SET_FIX_ANNO 0) -> IPPrint("Too long MTU") -> oerror;
+    // Send back ICMP Parameter Problem messages for badly formed
+    // IP options. Should set the code to point to the
+    // bad byte, but that's too hard.
+    output0[2] -> ICMPError(10.1.0.1, parameterproblem, SET_FIX_ANNO 0) -> IPPrint("IPGW options") -> oerror;
+    // Send back an ICMP redirect if required.
+    output0[1] -> ICMPError(10.1.0.1, redirect, host, SET_FIX_ANNO 0) -> IPPrint("ICMP Error : Redirect") -> arpq0;
+    output0[0] 
+    -> myLB()
+    -> arpq0;
+}
+
+
+    define ($MTU2 1500)
+    define ($ip2 10.0.0.2)
+    define ($eth2 1c:34:da:64:6d:10)
+elementclass FNT2 { 
+    tol :: Discard(); //ToHost normally
+
+input[0] ->
+            c0 :: Classifier(    12/0806 20/0001,
+                                 12/0806 20/0002,
+                                 12/0800,
+                                 -);
+
+        // Respond to ARP Query
+        c0[0] -> arpress :: ARPResponder($ip2 $eth2);
+        arpress[0] -> Print("ARP QUERY") -> [0]output;
+
+        // Deliver ARP responses to ARP queriers as well as Linux.
+        t :: Tee(2);
+        c0[1] -> t;
+        t[0] -> Print("Input to linux") -> tol; //To linux
+        t[1] -> Print("Arp response") -> [0]output; //Directly output
+
+  
+        // Unknown ethernet type numbers.
+        c0[3] -> Print() -> Discard();
+
+        
+    // An "ARP querier" for each interface.
+    arpq0 :: EtherEncap(0x0800, 1c:34:da:64:6d:10, b8:59:9f:f7:3a:d4);
+    // Connect ARP outputs to the interface queues.
+    arpq0 -> [0]output;
+
+    // IP routing table.
+    rt :: LookupIPRouteMP(   0.0.0.0/0 0);
+
+    // Hand incoming IP packets to the routing table.
+    // CheckIPHeader checks all the lengths and length fields
+    // for sanity.
+    ip ::
+    Strip(14)
+    -> CheckIPHeader(CHECKSUM false, VERBOSE false)
+    -> [0]rt;
+
+    oerror :: IPPrint("ICMP Error : DF") -> [0]rt;
+    ttlerror :: IPPrint("ICMP Error : TTL") -> [0]rt;
+    //rederror :: IPPrint("ICMP Error : Redirect") -> [0]rt;
+
+
+    c0[2] -> Paint(1) -> ip;
+    rt[0] -> output0 :: IPOutputCombo(2, 10.1.0.1, $MTU2);
+    // DecIPTTL[1] emits packets with expired TTLs.
+    // Reply with ICMPs. Rate-limit them?
+    output0[3] -> ICMPError(10.1.0.1, timeexceeded, SET_FIX_ANNO 0) -> ttlerror;
+    // Send back ICMP UNREACH/NEEDFRAG messages on big packets with DF set.
+    // This makes path mtu discovery work.
+    output0[4] -> ICMPError(10.1.0.1, unreachable, needfrag, SET_FIX_ANNO 0) -> oerror;
+    // Send back ICMP Parameter Problem messages for badly formed
+    // IP options. Should set the code to point to the
+    // bad byte, but that's too hard.
+    output0[2] -> ICMPError(10.1.0.1, parameterproblem, SET_FIX_ANNO 0) -> oerror;
+    // Send back an ICMP redirect if required.
+    output0[1] -> ICMPError(10.1.0.1, redirect, host, SET_FIX_ANNO 0) -> IPPrint("ICMP Error : Redirect") -> arpq0;
+    output0[0]
+    -> myLB()
+    -> arpq0;
+}
+
+
+DDIOTune(N_WAYS $DDIO_WAYS, DEV 3b:00.0, PRINT true)
+DDIOTune(N_WAYS $DDIO_WAYS, DEV 5e:00.0, PRINT true) // 5f instead of 5e
+
+fd0 :: FromDPDKDevice(0, MAXTHREADS $CPUS1 , BURST 32 , TIMESTAMP false, PAUSE none, CLEAR 0, NDESC $RXDESC, VERBOSE 1)
+    -> FNT()
+    -> ToDPDKDevice(0000:3b:00.0, NDESC 1024, BLOCKING true)
+
+fd1 :: FromDPDKDevice(1, MAXTHREADS $CPUS2 , BURST 32 , TIMESTAMP false, PAUSE none, CLEAR 0, NDESC $RXDESC, VERBOSE 1)
+    -> FNT2()
+    -> ToDPDKDevice(0000:5e:00.0, NDESC 1024, BLOCKING true)
+
+DriverManager(  wait $STARTUP,
+		print "Measuring cycles from now!",
+		write fd0.cycles_idle 0,
+		write fd0.cycles_pb 0,
+		write fd1.cycles_idle 0,
+		write fd1.cycles_pb 0,
+                write fd0.xstats 0,
+                write fd1.xstats 0,
+		wait 20,
+                read fd0.xstats,
+                read fd1.xstats,
+		print "RESULT-CYCLEPB1 $(fd0.cycles_pb)",
+		print "RESULT-CYCLEPB2 $(fd1.cycles_pb)",
+		print "RESULT-CYCLE_IDLE1 $(fd0.cycles_idle)",
+		print "RESULT-CYCLE_IDLE2 $(fd1.cycles_idle)",
+		wait,
+                )
