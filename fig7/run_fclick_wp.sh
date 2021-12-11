@@ -5,9 +5,9 @@ cd `dirname $0`
 [ -z "$NMBASE" ] && echo "Missing environment variable. Please run 'source scripts/env.h' from the root directory" && exit -1
 [ -z "$REPEAT" ] && REPEAT=1
 
-TBASE=$NMBASE/fig7
+export TBASE=$NMBASE/fig7
 [ ! -e "$TBASE" ] && echo "base directory is not at $TBASE" && exit -1
-RBASE=$TBASE/Results
+export RBASE=$TBASE/Results
 Test=fclick_wp
 
 # Total runtime lower limit:
