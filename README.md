@@ -73,12 +73,12 @@ source ./scripts/env.sh
 ```
 
 Now, on the server run the following to obtain all submodules and compile the
-environment: (This step can be skipped in our lab environment)
+environment:
 ```
 ./scripts/make-server.sh
 ```
 
-And on the client run: (This step can be skipped in our lab environment)
+And on the client run:
 ```
 ./scripts/make-client.sh
 ```
