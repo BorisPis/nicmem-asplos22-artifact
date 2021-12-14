@@ -31,7 +31,7 @@ fi
 
 # compile fastclick only if missing -- it assumes dpdk is pre-installed
 if [ -z "$(ls -A $FASTCLICK/userlevel/click)" ]; then
-  echo -ne 'Compilig $FASTCLICK...'
+  echo -ne 'Compilig fastclick...'
   cd $FASTCLICK
   ./configure --enable-dpdk-pool --enable-dpdk --enable-intel-cpu --verbose --enable-select=poll CFLAGS="-O3" CXXFLAGS="-std=c++11 -O3" --disable-dynamic-linking --enable-poll --enable-bound-port-transfer --enable-local --enable-flow --disable-task-stats --disable-cpu-load --enable-dpdk-packet --disable-clone --disable-dpdk-softqueue --enable-research >& fastclick.log
   make -j >> fastclick.log 2>&1
