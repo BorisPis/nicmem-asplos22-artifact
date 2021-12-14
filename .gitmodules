@@ -18,3 +18,7 @@
 	path = micac
 	url = https://github.com/BorisPis/asplos22-nicmem-mica.git
 	branch = client-asplos22
+[submodule "rdma-core-server"]
+	path = rdma-core-server
+	url = https://github.com/linux-rdma/rdma-core
+	branch = stable-v33

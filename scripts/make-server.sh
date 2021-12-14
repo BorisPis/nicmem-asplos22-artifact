@@ -6,6 +6,7 @@ then
   exit -1
 fi
 
+RDMA=$NMBASE/rdma-core-server
 FASTCLICK=$NMBASE/fastclick
 DPDK=$NMBASE/dpdk
 MICA=$NMBASE/micas
@@ -13,6 +14,22 @@ PCM=$NMBASE/tools/pcm
 
 git submodule init
 git submodule update
+
+# compile rdma-core assuming all dependencies were met 
+echo -ne 'Compilig rdma-core...'
+cd $RDMA
+./build.sh >& rdma.log
+cmake . >> rdma.log 2>&1
+make -j >& rdma.make.log
+sudo -E make -j install >& rdma.make-install.log
+cd - >& /dev/null
+
+if [ -z "$(ls -A $RDMA/lib/libibverbs.so)" ]; then
+  echo "rdma-core compilation failed at $RDMA"
+  exit -1
+else
+  echo Done
+fi
 
 # compile dpdk assuming all dependencies were met 
 echo -ne 'Compilig dpdk...'
