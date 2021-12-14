@@ -22,3 +22,7 @@
 	path = rdma-core-server
 	url = https://github.com/linux-rdma/rdma-core
 	branch = stable-v33
+[submodule "rdma-core-client"]
+	path = rdma-core-client
+	url = https://github.com/linux-rdma/rdma-core
+	branch = stable-v23
