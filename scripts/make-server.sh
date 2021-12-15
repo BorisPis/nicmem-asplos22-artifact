@@ -31,7 +31,7 @@ else
   echo Done
 fi
 
-if [ "$(echo $PKG_CONFIG_PATH | grep rdma-core-server )" ]; then
+if [ -z "$(echo $PKG_CONFIG_PATH | grep rdma-core-server )" ]; then
   echo "PKG_CONFIG_PATH is missing rdma-core-server"
   exit -1
 else
