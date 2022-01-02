@@ -23,3 +23,6 @@
 	path = rdma-core-client
 	url = https://github.com/linux-rdma/rdma-core
 	branch = stable-v23
+[submodule "tools/pcm"]
+	path = tools/pcm
+	url = https://github.com/BorisPis/pcm.git
