@@ -7,9 +7,6 @@
 [submodule "trex"]
 	path = trex
 	url = https://github.com/BorisPis/asplos22-nicmem-trex.git
-[submodule "tools/pcm"]
-	path = tools/pcm
-	url = https://github.com/opcm/pcm.git
 [submodule "micas"]
 	path = micas
 	url = https://github.com/BorisPis/asplos22-nicmem-mica.git
