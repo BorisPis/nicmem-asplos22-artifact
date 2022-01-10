@@ -32,7 +32,8 @@ def filter_csv(csv, keys):
         l = test
         #print (res[test]['Total_rx_bw']), (res[test]['Total_tx_bw'])
         l += ',%.2f,' % (float(res[test]['Total_rx_bw']) + float(res[test]['Total_tx_bw']))
-        l += '%.2f,' % float(res[test]['cpu_total'])
+        #l += '%.2f,' % float(res[test]['cpu_total'])
+        l += '%.2f,' % float(0)
         for k in keys:
             if not k in res[test].keys():
                 l += '%s,' % 'Nan'
