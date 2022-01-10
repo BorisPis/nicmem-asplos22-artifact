@@ -80,6 +80,7 @@ environment:
 
 And on the client run:
 ```
+source ./scripts/env-client.sh
 ./scripts/make-client.sh
 ```
 
@@ -94,7 +95,7 @@ All benchmarks should be executed from the server machine.
 > To reduce reproduction time, we set the experiments to run once (instead of
 > 10 times). You can change that by modifying the `REPEAT` parameter in the
 > test scripts.
-> Running fig7 once takes ~480min; 10 repeatitions will require 4800min=80hrs.
+> Running fig7 once takes ~1920min; 10 repeatitions will require 19200min=320hrs.
 >
 > Running fig8 once takes ~90min; 10 repeatitions will require 900min=15hrs.
 >
