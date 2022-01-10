@@ -1,5 +1,6 @@
 #~/bin/bash
 
+LD_LIB="LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu" #dpdk's install path
 basedir=`dirname \`realpath $0\``
 basedir=`dirname \`realpath $0\``
 MICAS_BASE=$NMBASE/micas/build
@@ -92,8 +93,8 @@ scp $WORKLOAD_FILE.tmp $loader1:/tmp/$TMP_DATE
 #-------------------------------------------------
 
 # run new mica instance using GENERIC values
-echo sudo -E $MICAS_BASE/src/netbench_server_latency $MACHINE_FILE.tmp server 0 0 $PREPOPULATION_FILE.tmp $REQUEST_RATE $_SPLIT $_NICMEM $MLXINLINE $_MAX_NICMEM_KEY
-sudo -E $MICAS_BASE/src/netbench_server_latency $MACHINE_FILE.tmp server 0 0 $PREPOPULATION_FILE.tmp $REQUEST_RATE $_SPLIT $_NICMEM $MLXINLINE $_MAX_NICMEM_KEY | tee -a $OUT_FILE/mica_server.txt &
+echo sudo -E $LD_LIB $MICAS_BASE/src/netbench_server_latency $MACHINE_FILE.tmp server 0 0 $PREPOPULATION_FILE.tmp $REQUEST_RATE $_SPLIT $_NICMEM $MLXINLINE $_MAX_NICMEM_KEY
+sudo -E $LD_LIB $MICAS_BASE/src/netbench_server_latency $MACHINE_FILE.tmp server 0 0 $PREPOPULATION_FILE.tmp $REQUEST_RATE $_SPLIT $_NICMEM $MLXINLINE $_MAX_NICMEM_KEY | tee -a $OUT_FILE/mica_server.txt &
 # it takes 20 seconds to boot 1 mica therad 
 sleep 20
 #--------------------------------------------------
