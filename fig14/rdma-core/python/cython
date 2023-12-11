@@ -1,0 +1,3 @@
+#!/usr/bin/python3
+from Cython.Compiler.Main import main
+main(command_line = 1)

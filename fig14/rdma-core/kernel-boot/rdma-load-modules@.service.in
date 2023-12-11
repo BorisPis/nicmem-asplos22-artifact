@@ -1,0 +1,25 @@
+[Unit]
+Description=Load RDMA modules from /usr/local/etc/rdma/modules/%I.conf
+Documentation=file:/usr/local/share/doc/rdma-core/udev.md
+# Kernel module loading must take place before sysinit.target, similar to
+# systemd-modules-load.service
+DefaultDependencies=no
+Before=sysinit.target
+# Do not execute concurrently with an ongoing shutdown
+Conflicts=shutdown.target
+Before=shutdown.target
+# Partially support distro network setup scripts that run after
+# systemd-modules-load.service but before sysinit.target, eg a classic network
+# setup script. Run them after modules have loaded.
+Wants=network-pre.target
+Before=network-pre.target
+# Orders all kernel module startup before rdma-hw.target can become ready
+Before=rdma-hw.target
+
+ConditionCapability=CAP_SYS_MODULE
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/lib/systemd/systemd-modules-load /usr/local/etc/rdma/modules/%I.conf
+TimeoutSec=90s
